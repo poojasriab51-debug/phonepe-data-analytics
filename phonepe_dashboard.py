@@ -8,78 +8,65 @@ Run with: streamlit run phonepe_dashboard.py
 
 import streamlit as st
 import pandas as pd
-import sqlite3
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import os
 
 # Page config
 st.set_page_config(
-    page_title="PhonePe Analytics Dashboard Project 1",
+    page_title="PhonePe Analytics Dashboard",
     page_icon="📱",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Database path
-DB_PATH = os.path.join(os.path.dirname(__file__), "phonepe_analysis.db")
-
 @st.cache_data
 def load_data():
-    """Load data from SQLite database"""
-    conn = sqlite3.connect(DB_PATH)
+    """Load data from CSV files"""
+    # Load transactions data
+    tx_df = pd.read_csv("phonepe_transactions.csv")
     
-    # Transactions data
-    tx_df = pd.read_sql_query("""
-        SELECT State, Year, Quarter, Transaction_type, 
-               Transaction_count, Transaction_amount
-        FROM transactions
-    """, conn)
+    # Rename columns to match expected format
+    tx_df = tx_df.rename(columns={
+        'Quater': 'Quarter',
+        'Transacion_type': 'Transaction_type',
+        'Transacion_count': 'Transaction_count',
+        'Transacion_amount': 'Transaction_amount'
+    })
     
-    # Users data
-    users_df = pd.read_sql_query("""
-        SELECT State, Year, Quarter, Registered_users, App_opens
-        FROM users
-    """, conn)
+    # Create a mock users dataframe from transactions for demonstration
+    users_df = tx_df[['State', 'Year', 'Quarter']].copy()
+    users_df['Registered_users'] = (tx_df['Transaction_count'] * 100).astype(int)
+    users_df['App_opens'] = (tx_df['Transaction_count'] * 150).astype(int)
     
-    # Aggregated queries
-    state_tx = pd.read_sql_query("""
-        SELECT State, 
-               SUM(Transaction_count) as Total_Transactions,
-               SUM(Transaction_amount) as Total_Amount
-        FROM transactions
-        GROUP BY State
-    """, conn)
+    # State-wise transaction totals
+    state_tx = tx_df.groupby('State').agg({
+        'Transaction_count': 'sum',
+        'Transaction_amount': 'sum'
+    }).reset_index()
+    state_tx.columns = ['State', 'Total_Transactions', 'Total_Amount']
     
-    tx_type = pd.read_sql_query("""
-        SELECT Transaction_type,
-               SUM(Transaction_count) as Total_Count,
-               SUM(Transaction_amount) as Total_Amount
-        FROM transactions
-        GROUP BY Transaction_type
-    """, conn)
+    # Transaction type breakdown
+    tx_type = tx_df.groupby('Transaction_type').agg({
+        'Transaction_count': 'sum',
+        'Transaction_amount': 'sum'
+    }).reset_index()
+    tx_type.columns = ['Transaction_type', 'Total_Count', 'Total_Amount']
     
-    quarterly = pd.read_sql_query("""
-        SELECT Year, Quarter,
-               SUM(Transaction_count) as Total_Count,
-               SUM(Transaction_amount) as Total_Amount
-        FROM transactions
-        GROUP BY Year, Quarter
-        ORDER BY Year, Quarter
-    """, conn)
+    # Quarterly aggregated data
+    quarterly = tx_df.groupby(['Year', 'Quarter']).agg({
+        'Transaction_count': 'sum',
+        'Transaction_amount': 'sum'
+    }).reset_index()
+    quarterly.columns = ['Year', 'Quarter', 'Total_Count', 'Total_Amount']
     
-    # Latest users by state
-    latest_users = pd.read_sql_query("""
-        SELECT u.State, u.Year, u.Quarter, u.Registered_users, u.App_opens
-        FROM users u
-        INNER JOIN (
-            SELECT State, MAX(Year * 4 + Quarter) as max_period 
-            FROM users GROUP BY State
-        ) m ON u.State = m.State AND (u.Year * 4 + u.Quarter) = m.max_period
-    """, conn)
-    
-    conn.close()
+    # Latest users by state (using mock data)
+    latest_users = users_df.groupby('State').agg({
+        'Year': 'max',
+        'Quarter': 'max',
+        'Registered_users': 'sum',
+        'App_opens': 'sum'
+    }).reset_index()
     
     return tx_df, users_df, state_tx, tx_type, quarterly, latest_users
 
@@ -431,4 +418,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
