@@ -9,7 +9,9 @@ venv/
 ENV/
 env/
 
-# Database files
+# Database files - but keep the main analysis database
+# phonepe_analysis.db is needed for the dashboard
+!phonepe_analysis.db
 *.db
 *.sqlite
 *.sqlite3
