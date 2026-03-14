@@ -16,7 +16,7 @@ A comprehensive Streamlit dashboard for visualizing PhonePe transaction and user
 
 - **Frontend**: Streamlit (Python web framework)
 - **Data Visualization**: Plotly
-- **Database**: SQLite
+**Data**: CSV (Streamlit Cloud compatible)
 - **Data Source**: PhonePe Pulse Dataset
 
 ## Installation
@@ -43,7 +43,7 @@ pip install -r requirements.txt
 streamlit run phonepe_dashboard.py
 ```
 
-5. Open http://localhost:8501 in your browser
+5. Open **https://phonepe-data-analytics-7ctaa3ghsmq2jmphceccpb.streamlit.app/** in your browser
 
 ## Deployment to Streamlit Cloud
 
