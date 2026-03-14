@@ -2,7 +2,7 @@
 
 A comprehensive Streamlit dashboard for visualizing PhonePe transaction and user data across India (2018-2024).
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=PhonePe+Analytics+Dashboard)
+![Dashboard Preview](https://phonepe-data-analytics-7ctaa3ghsmq2jmphceccpb.streamlit.app/)
 
 ## Features
 
