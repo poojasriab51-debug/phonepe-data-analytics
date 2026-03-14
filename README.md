@@ -23,7 +23,7 @@ A comprehensive Streamlit dashboard for visualizing PhonePe transaction and user
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/poojasri ABb51-debug/phonepe-data-analytics.git
+git clone https://github.com/poojasriab51-debug/phonepe-data-analytics.git
 cd phonepe-data-analytics
 ```
 
@@ -75,7 +75,7 @@ This project uses data from [PhonePe Pulse](https://github.com/PhonePe/pulse) wh
 
 ## Author
 
-Pooja Sria
+Poojasri AB
 
 ## Acknowledgments
 
